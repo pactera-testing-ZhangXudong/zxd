@@ -1,0 +1,26 @@
+pipeline {
+    agent {
+        label "master"
+    }
+    //options {
+    //    ansiColor('xterm')
+    //}
+    stages {
+        stage('Get source code'){
+            steps{
+                checkout scm
+                sh 'git submodule init && git submodule update'
+            }
+        }
+        stage('Init Environment'){
+            steps{
+                sh 'docker pull postman/newman:4.5-alpine'
+            }
+        }
+        stage('build') {
+            steps {
+                sh 'docker run --rm -v \$(pwd):/etc/newman -t postman/newman:4.5-alpine run weather.json --insecure'
+            }
+        }
+    }
+}
